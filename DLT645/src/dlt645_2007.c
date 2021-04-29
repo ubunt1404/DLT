@@ -13,7 +13,7 @@
 #include "dlt645_2007_private.h"
 #include "string.h"
 #include "serial.h"
-
+#include <stdio.h>
 /**
  * Name:    dlt645_2007_recv_check
  * Brief:   DLT645-2007 数据校验
@@ -28,6 +28,8 @@ int dlt645_2007_recv_check(uint8_t *msg, int len, uint8_t * addr, uint32_t code)
 {
     if (dlt645_common_check(msg, len, addr) < 0)
     {
+        printf("dlt645_common_check error!\n");
+        printf("file:%s line:%d\n",__FILE__,__LINE__);
         return -1;
     }
     if (msg[DL645_CONTROL_POS] == 0x94)
@@ -188,14 +190,15 @@ int dlt645_2007_read_data(SerialPort self,
 
 	if (dlt645_send_msg(self, ctx, send_buf, DL645_2007_RD_CMD_LEN) < 0)
     {
-		printf("dlt645_send_msg error! at line:%d\n",__LINE__);
-        DLT645_LOG("send data error!\n");
+        printf("send data error!\n");
+        printf("file:%s line:%d\n",__FILE__,__LINE__);
         return -1;
     }
 
     if (dlt645_receive_msg(self, ctx, read_buf, DL645_RESP_LEN, code, DLT645_2007) < 0)
     {
-        DLT645_LOG("receive msg error!\n");
+        printf("receive msg error!\n");
+        printf("file:%s line:%d\n",__FILE__,__LINE__);
         return -1;
     }
 
@@ -247,14 +250,16 @@ int dlt645_write_data(SerialPort self,
     memcpy(send_buf + DL645_DATA_POS + 12, write_data, write_len);
     if (dlt645_send_msg(self, ctx, send_buf, 24 + write_len) < 0)
     {
-        DLT645_LOG("send data error!\n");
+        printf("send data error!\n");
+        printf("file:%s line:%d\n",__FILE__,__LINE__);
         return -1;
     }
 
     if (dlt645_receive_msg(self, ctx, read_buf, DL645_RESP_LEN, code, DLT645_2007) < 0)
     {
-        DLT645_LOG("receive msg error!\n");
-        return -1;
+        printf("receive msg error!\n");
+        printf("file:%s line:%d\n",__FILE__,__LINE__);
+		return -1;
     }
     return 0;
 }

@@ -1,4 +1,3 @@
-#可以用 echo来帮助调试写的 makefile文件
 
 #定义路径变量
 SERIAL_DIR =./serial
@@ -10,7 +9,7 @@ OBJ_DIR =./obj
 #定义指定头文件路径参数 和 gcc编译参数 及 可执行文件
 CC = gcc   
 INC = -Iinc -Iserial -Iport
-CFLAGS = -g -Wall ${INC}
+CFLAGS = ${INC}
 BIN_TARGET = test
 
 # 获取要求中工作目录下的所有的.c文件列表
@@ -45,12 +44,5 @@ ${OBJ_DIR}/%.o:${SAMPLE_DIR}/%.c
 #删除文件
 .PHONY:clean  
 clean:  
-	# -exec 后面接执行命令
-	# rm -rf {}命令就是删除文件 
-	# \;这是格式要求的没有具体含义。
-	# 嵌套执行make命令如下：
-	# ${MAKE} -C +目录名(含有makefile文件的子目录)等价于 先cd到 目录名/ 再执行make命令  
-	# ${MAKE} clean -C +目录名(含有makefile文件的子目录)等价于 先cd到 目录名/ 再执行make clean 命令 
 	find $(OBJ_DIR) -name *.o -exec rm -rf {} \; 
 	rm -rf test a.out *.o 
-	#${MAKE} clean -C serial

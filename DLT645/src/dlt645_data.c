@@ -50,9 +50,11 @@ int _crc(uint8_t *msg, int len)
  */
 int dlt645_common_check(uint8_t *msg, int len, uint8_t *addr)
 {
-    //数据包长度校验
+    //一次性从串口接收到的所有数据长度校验
     if (len < 7)
     {
+		printf("error! pack len too short!\n");
+		printf("file:%s line:%d\n",__FILE__,__LINE__);
         return -1;
     }
     //数据帧标志校验
@@ -60,31 +62,41 @@ int dlt645_common_check(uint8_t *msg, int len, uint8_t *addr)
         msg[DL645_ADDR_LEN + 1] != DL645_START_CODE ||
         msg[len - 1] != DL645_STOP_CODE)
     {
-        DLT645_LOG("check code error!\n");
+        printf("check code error!\n");
+		printf("file:%s line:%d\n",__FILE__,__LINE__);
         return -1;
     }
     //CRC校验
     uint8_t crc = _crc(msg, len - 2);
     if (crc != msg[len - 2])
     {
-        DLT645_LOG("check crc error!\n");
+        printf("check crc error!\n");
+		printf("file:%s line:%d\n",__FILE__,__LINE__);
         return -1;
     }
     //控制码主从校验
     if ((msg[DL645_CONTROL_POS] & C_TD_MASK) == (C_TD_MASTER << C_TD_POS))
     {
-        DLT645_LOG("check control direction error!\n");
+        printf("check control direction error!\n");
+		printf("file:%s line:%d\n",__FILE__,__LINE__);
         return -1;
     }
     //控制码应答校验
     if ((msg[DL645_CONTROL_POS] & C_ACK_MASK) == (C_ACK_ERR << C_ACK_POS))
     {
-        DLT645_LOG("check ACK error!\n");
+        printf("check ACK error!\n");
+		printf("file:%s line:%d\n",__FILE__,__LINE__);
         return msg[len - 3];
     }
+
     //从站地址校验
+	printf("file:%s line:%d\n",__FILE__,__LINE__);
+	printf("addr is:%02x\n",*addr);//这里的地址出了问题
+	printf("msg is:%02x\n",*(msg+1));//这里的地址是对的
     if (memcmp(msg + 1, addr, 6) != 0)
     {
+		printf("slave addr check error!\n");
+		printf("file:%s line:%d\n",__FILE__,__LINE__);
         return -1;
     }
 

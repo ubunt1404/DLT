@@ -1,5 +1,5 @@
-#ifndef _DLT645_H
-#define _DLT645_H
+#ifndef __DLT645_H
+#define __DLT645_H
 
 #include <stdint.h>
 #include "serial.h"
@@ -40,4 +40,4 @@ extern uint32_t dec_to_bcd(uint32_t val);
 //字符串转BCD形式
 extern int str_to_bcd(char *str, uint8_t *bcd_store_address, uint16_t bcd_len);
 
-#endif
+#endif /* __DLT645_H */

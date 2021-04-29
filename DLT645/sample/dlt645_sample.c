@@ -16,10 +16,15 @@
 #include "serial.h"
 
 //dlt645 采集测试标识符 （A相电压）
-#define DLT645_2007_READ_TEST_CODE 0x02010100
-#define DLT645_1997_READ_TEST_CODE 0xB611
-uint8_t test_addr[6] = {0x00,0x00,0x00,0x00,0x00,0x01};
+#define DLT645_2007_READ_V_TEST_CODE 0x02010100//ok
+#define DLT645_1997_READ_V_TEST_CODE 0xB611//ok
 
+//dlt645 采集测试标识符（A相电流）
+#define DLT645_2007_READ_A_TEST_CODE 0x02020100
+#define DLT645_1997_READ_A_TEST_CODE 0xB621//ok
+
+uint8_t test_addr_1997[6] = {0x03,0x00,0x00,0x00,0x00,0x00};
+uint8_t test_addr_2007[6] = {0x61,0x01,0x00,0x00,0x00,0x00};
 /**
  * Name:    dlt645_read_test
  * Brief:   dlt645协议采集测试程序
@@ -32,12 +37,14 @@ static void dlt645_read_test(SerialPort self)
     memset(read_buf, 0, 4);
     
     //设置从机地址
-    dlt645_set_addr(&dlt645,test_addr);
+    //dlt645_set_addr(&dlt645,test_addr_1997);
+    dlt645_set_addr(&dlt645,test_addr_2007);
     
-    //if(dlt645_read_data(&dlt645,DLT645_1997_READ_TEST_CODE,read_buf,DLT645_1997) > 0) //1997采集测试
-    if(dlt645_read_data(self, &dlt645, DLT645_2007_READ_TEST_CODE, read_buf, DLT645_2007) > 0)  //2007采集测试
+    //if(dlt645_read_data(self,&dlt645,DLT645_1997_READ_A_TEST_CODE,read_buf,DLT645_1997) > 0) //1997采集测试
+    if(dlt645_read_data(self, &dlt645, DLT645_2007_READ_A_TEST_CODE, read_buf, DLT645_2007) > 0)  //2007采集测试
     {
-        printf("读取成功,A相电压值为: %.2f \r\n",*(float *)read_buf);
+        //printf("读取成功,A相电压值为: %.2f \r\n",*(float *)read_buf);
+        printf("读取成功,A相电流值为: %.3f \r\n",*(float *)read_buf);
     }
     else
     {

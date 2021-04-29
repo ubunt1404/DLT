@@ -13,7 +13,7 @@
 #include "serial.h"
 #include <unistd.h>
 #include <stdio.h>
-
+#include <stdlib.h>
 dlt645_t dlt645;
 
 /**
@@ -31,7 +31,6 @@ int dlt645_hw_read(SerialPort self, uint8_t *msg ,uint16_t len)
 	//实际接收长度
 	int read_len = 0;
 	
-	printf("file: %s at line %d is ok!\n",__FILE__,__LINE__);
 	//每次读取一个字节的数据
 	while (SerialPort_readByte(self->fd,msg + read_len, 1) == 1)
 	{
@@ -44,6 +43,7 @@ int dlt645_hw_read(SerialPort self, uint8_t *msg ,uint16_t len)
 			read_len ++;
 		}
 	}
+	
 	return read_len;
 }
 
@@ -59,10 +59,6 @@ int dlt645_hw_read(SerialPort self, uint8_t *msg ,uint16_t len)
 static int dlt645_hw_write(SerialPort self, uint8_t *buf, uint16_t len)
 {
 	//串口发送数据
-	printf("hello 1 !\n");
-	printf("file :%s  line :%d  fd:%d\n",__FILE__,__LINE__,self->fd);
-	printf("hello 2 !\n");
-	printf("self -> fd is :%d\n",self->fd);
 	return SerialPort_write(self->fd, buf, 0, len);
 }
 

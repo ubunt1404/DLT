@@ -1,19 +1,20 @@
 /*************************************************
- Copyright (c) 2021
- All rights reserved.
- File name:     dlt645.c
- Description:   
- History:
- 1. Version:    
-    Date:       2021-02-20
-    Author:     guhaiming
-    Modify:     
-*************************************************/
+  Copyright (c) 2021
+  All rights reserved.
+  File name:     dlt645.c
+Description:   
+History:
+1. Version:    
+Date:       2021-02-20
+Author:     guhaiming
+Modify:     
+ *************************************************/
 #include "dlt645_private.h"
 #include "dlt645_1997.h"
 #include "dlt645_2007.h"
 #include "string.h"
 #include "serial.h"
+#include <stdio.h>
 /**
  * Name:    dlt645_receive_msg
  * Brief:   645协议调用底层接收数据
@@ -28,23 +29,28 @@
  */
 int dlt645_receive_msg(SerialPort self, dlt645_t *ctx, uint8_t *msg, uint16_t len, uint32_t code, dlt645_protocal protocal)
 {
-	printf("fd were print ?\n");
-	printf("file :%s  line :%d  fd:%d\n",__FILE__,__LINE__,self->fd);
-    int msg_len = ctx->read(self, msg, len);
-	printf("file:%s line:%d\n",__FILE__,__LINE__);
+	int i=0;
+	int msg_len = ctx->read(self, msg, len);
+	printf("file:%s line:%d read %d bytes is:\n",__FILE__,__LINE__,msg_len);
+	for(i=0;i<msg_len;i++)
+	{
+		printf("0x%02x ",msg[i]);                                  
+	}
+	printf("\n");
 
-    if (protocal == DLT645_1997)
-    {
-        return dlt645_1997_recv_check(msg, msg_len, ctx->addr, code);
-    }
-    else if (protocal == DLT645_2007)
-    {
-        return dlt645_2007_recv_check(msg, msg_len, ctx->addr, code);
-    }
-    else
-    {
-        return -1;
-    }
+	if (protocal == DLT645_1997)
+	{
+		return dlt645_1997_recv_check(msg, msg_len, ctx->addr, code);
+	}
+	else if (protocal == DLT645_2007)
+	{
+		return dlt645_2007_recv_check(msg, msg_len, ctx->addr, code);
+	}
+	else
+	{
+		printf("file:%s line:%d \n",__FILE__,__LINE__);
+		return -1;
+	}
 }
 
 /**
@@ -58,12 +64,12 @@ int dlt645_receive_msg(SerialPort self, dlt645_t *ctx, uint8_t *msg, uint16_t le
  */
 int dlt645_send_msg(SerialPort self, dlt645_t *ctx, uint8_t *msg, int len)
 {
-    msg[0] = DL645_START_CODE;
-    msg[DL645_ADDR_LEN + 1] = DL645_START_CODE;
-    msg[len - 1] = DL645_STOP_CODE;
-    msg[len - 2] = _crc(msg, len - 2);
-	
-    return ctx->write(self, msg, len);
+	msg[0] = DL645_START_CODE;
+	msg[DL645_ADDR_LEN + 1] = DL645_START_CODE;
+	msg[len - 1] = DL645_STOP_CODE;
+	msg[len - 2] = _crc(msg, len - 2);
+
+	return ctx->write(self, msg, len);
 }
 
 /**
@@ -76,16 +82,20 @@ int dlt645_send_msg(SerialPort self, dlt645_t *ctx, uint8_t *msg, int len)
  */
 void dlt645_set_addr(dlt645_t *ctx, uint8_t *addr)
 {
-    uint8_t addr_temp[6];
-    memset(addr_temp, 0, 6);
-	
+	uint8_t addr_temp[6];
+	memset(addr_temp, 0, 6);
+
 	int i = 0;
-    //转换字节序
-    for (i = 0; i < 6; i++)
-    {
-        addr_temp[5 - i] = addr[i];
-    }
-    memcpy(ctx->addr, addr_temp, DL645_ADDR_LEN);
+	//转换字节序
+#if 0   
+	for (i = 0; i < 6; i++)
+	{
+		addr_temp[5 - i] = addr[i];
+		printf("file:%s line:%d addr_temp[5 - i]:%02x\n",__FILE__,__LINE__,addr_temp[5 - i]);
+	}
+	memcpy(ctx->addr, addr_temp, DL645_ADDR_LEN);
+#endif
+	memcpy(ctx->addr, addr, DL645_ADDR_LEN);
 }
 
 /**
@@ -98,8 +108,8 @@ void dlt645_set_addr(dlt645_t *ctx, uint8_t *addr)
  */
 int dlt645_set_debug(dlt645_t *ctx, int flag)
 {
-    ctx->debug = flag;
-    return 0;
+	ctx->debug = flag;
+	return 0;
 }
 
 /**
@@ -114,23 +124,23 @@ int dlt645_set_debug(dlt645_t *ctx, int flag)
  * Output:  成功返回数据长度，失败返回-1
  */
 int dlt645_read_data(SerialPort self,
-					 dlt645_t *ctx,
-                     uint32_t code,
-                     uint8_t *read_data,
-                     dlt645_protocal protocal)
+		dlt645_t *ctx,
+		uint32_t code,
+		uint8_t *read_data,
+		dlt645_protocal protocal)
 {
-    int rs = -1;
-    switch (protocal)
-    {
-    case DLT645_1997:
-        rs = dlt645_1997_read_data(self, ctx, code, read_data);
-        break;
-    case DLT645_2007:
-        rs = dlt645_2007_read_data(self, ctx, code, read_data);
-        break;
-    default:
-        DLT645_LOG("unrecognized protocal!\r\n");
-        break;
-    }
-    return rs;
+	int rs = -1;
+	switch (protocal)
+	{
+		case DLT645_1997:
+			rs = dlt645_1997_read_data(self, ctx, code, read_data);
+			break;
+		case DLT645_2007:
+			rs = dlt645_2007_read_data(self, ctx, code, read_data);
+			break;
+		default:
+			printf("unrecognized protocal!\r\n");
+			break;
+	}
+	return rs;
 }

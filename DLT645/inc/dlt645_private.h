@@ -1,5 +1,5 @@
-#ifndef _DLT645_PRIVATE_H
-#define _DLT645_PRIVATE_H
+#ifndef __DLT645_PRIVATE_H
+#define __DLT645_PRIVATE_H
 
 #include "dlt645.h"
 
@@ -53,4 +53,4 @@ extern int dlt645_send_msg(SerialPort self, dlt645_t *ctx, uint8_t *msg, int len
 extern int data_package_translate_to_int(uint8_t *read_data, uint16_t len);
 //根据数据格式将645协议读取的数据转换为真实数据并存储
 extern int dlt645_data_parse_by_format_to_float(uint8_t *read_data, uint16_t read_len, const char *data_format, uint8_t *store_address);
-#endif
+#endif /* __DLT645_PRIVATE_H */
